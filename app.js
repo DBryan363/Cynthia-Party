@@ -85,19 +85,6 @@
     stars.appendChild(s);
   }
 
-  /* ---------- Velas flotantes ---------- */
-  const candles = $("#candles");
-  const nC = window.innerWidth < 500 ? 7 : 12;
-  for (let i = 0; i < nC; i++) {
-    const c = document.createElement("span");
-    c.className = "candle";
-    c.style.left = (4 + (i * 92) / nC + Math.random() * 6) + "%";
-    c.style.top = (3 + Math.random() * 42) + "%";
-    c.style.setProperty("--h", 16 + Math.random() * 16 + "px");
-    c.style.setProperty("--d", 4 + Math.random() * 4 + "s");
-    c.style.setProperty("--delay", -Math.random() * 5 + "s");
-    candles.appendChild(c);
-  }
 
   /* ---------- Cuenta regresiva ---------- */
   const cdEls = { d: $("#cdD"), h: $("#cdH"), m: $("#cdM"), s: $("#cdS") };

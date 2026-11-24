@@ -79,24 +79,6 @@ button, input { font: inherit; color: inherit; }
 }
 @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.6) rotate(0); } 50% { opacity: var(--o, .7); transform: scale(1) rotate(20deg); } }
 
-/* ---------- Velas flotantes ---------- */
-.candle {
-  position: absolute; width: 7px; height: var(--h, 22px);
-  background: linear-gradient(90deg, #e9dcc0, #fffaf0 45%, #d9c9a6);
-  border-radius: 2px 2px 1px 1px;
-  opacity: .75;
-  animation: float var(--d, 6s) ease-in-out var(--delay, 0s) infinite;
-}
-.candle::before { /* llama */
-  content: ""; position: absolute; left: 50%; bottom: 100%; width: 7px; height: 11px; margin-left: -3.5px;
-  border-radius: 50% 50% 45% 45% / 70% 70% 35% 35%;
-  background: radial-gradient(circle at 50% 75%, #fff 0 20%, #ffd76a 45%, rgba(255,140,40,.9) 70%, transparent 72%);
-  box-shadow: 0 0 14px 4px rgba(255, 190, 80, .35);
-  animation: flicker 1.6s ease-in-out infinite alternate;
-}
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-@keyframes flicker { 0% { transform: scale(1) rotate(-3deg); opacity: .95; } 100% { transform: scale(.85, 1.1) rotate(3deg); opacity: .75; } }
-
 /* ---------- Ticker ---------- */
 .ticker {
   position: relative; z-index: 2;
