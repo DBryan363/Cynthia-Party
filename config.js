@@ -5,13 +5,13 @@
 window.INVITE_CONFIG = {
   // Quién cumple
   celebrant: {
-    name: "Valentina",          // Nombre que aparece en grande
+    name: "Cynthia",            // Nombre que aparece en grande
     age: 30,                    // Pon null si no quieres mostrar la edad
   },
 
   // Fecha y hora (formato ISO con la zona horaria de la fiesta)
-  // Ej: "2026-12-12T20:00:00-05:00" = 12 de diciembre de 2026, 8:00 PM (UTC-5)
-  startISO: "2026-12-12T20:00:00-05:00",
+  // Ej: "2026-11-27T20:00:00-05:00" = 27 de noviembre de 2026, 8:00 PM (UTC-5)
+  startISO: "2026-11-27T20:00:00-05:00",
   durationHours: 5,             // Para el botón "Agendar" (calendario)
   timeZone: "America/Bogota",   // Zona horaria para mostrar fecha/hora
 
@@ -32,7 +32,7 @@ window.INVITE_CONFIG = {
   },
 
   // Fecha límite para confirmar (texto libre, se muestra tal cual)
-  rsvpDeadline: "5 de diciembre",
+  rsvpDeadline: "25 de noviembre",
 
   // URL de la Web App de Google Apps Script (ver README → "Conectar Google Sheets").
   // Déjala vacía para probar en "modo demo" (no guarda nada, solo simula).
