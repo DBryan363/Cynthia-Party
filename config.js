@@ -10,18 +10,18 @@ window.INVITE_CONFIG = {
   },
 
   // Fecha y hora (formato ISO con la zona horaria de la fiesta)
-  // Ej: "2026-11-27T20:00:00-05:00" = 27 de noviembre de 2026, 8:00 PM (UTC-5)
-  startISO: "2026-11-27T20:00:00-05:00",
+  // Ej: "2026-11-27T23:00:00-05:00" = 27 de noviembre de 2026, 11:00 PM (UTC-5)
+  startISO: "2026-11-27T23:00:00-05:00",
   durationHours: 5,             // Para el botón "Agendar" (calendario)
-  timeZone: "America/Bogota",   // Zona horaria para mostrar fecha/hora
+  timeZone: "America/Lima",   // Zona horaria para mostrar fecha/hora
 
   // Lugar
   venue: {
-    name: "Salón Neón Club",
-    address: "Calle 85 #11-53, Bogotá",
+    name: "José Pereira 560",
+    address: "Los Olivos, Lima",
     // Lo que se buscará en Google Maps (puede ser la dirección o el nombre del lugar).
     // Si tienes un enlace exacto de Google Maps, ponlo en mapsUrl y tendrá prioridad.
-    mapsQuery: "Calle 85 #11-53, Bogotá",
+    mapsQuery: "José Pereira 560, Los Olivos, Lima, Perú",
     mapsUrl: "",
   },
 

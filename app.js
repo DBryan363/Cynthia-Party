@@ -94,7 +94,7 @@
       const box = $("#countdown");
       box.classList.add("is-live");
       const after = Date.now() - start > (C.durationHours || 5) * 3600e3;
-      box.innerHTML = `<div class="live">${after ? "Gracias por cantar con nosotros ★" : "¡Estamos en vivo! 🎤"}</div>`;
+      box.innerHTML = `<div class="live">${after ? "Gracias por bailar con nosotros ★" : "¡La fiesta empezó! 🎉"}</div>`;
       return;
     }
     const t = Math.floor(diff / 1000);
@@ -115,7 +115,7 @@
     if (!validStart) return;
     const end = new Date(start.getTime() + (C.durationHours || 5) * 3600e3);
     const utc = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-    const title = `${name} · The Birthday Tour 🎤`;
+    const title = `${name} · The Birthday Tour 🎉`;
     const loc = [C.venue?.name, C.venue?.address].filter(Boolean).join(", ");
     const details = `Dress code: ${C.dressCode?.title || ""}. ${C.dressCode?.detail || ""}\n${location.href.split("?")[0]}`;
     const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document;
@@ -177,7 +177,7 @@
     mark($("#attendField"), !d.attending);
     if (first) {
       msg.textContent = !d.attending && d.firstName.length >= 2 && d.lastName.length >= 2
-        ? "Elige si vienes o no 🎤"
+        ? "Elige si vienes o no 🎉"
         : "Escribe tu nombre y apellido para firmar la lista ✍️";
       (first.querySelector("input") || first).focus({ preventScroll: false });
       return false;
@@ -255,12 +255,12 @@
     $("#passEyebrow").textContent = yes ? "Backstage pass" : "Gracias por avisar";
     $("#passName").textContent = `${r.firstName} ${r.lastName}`;
     $("#passMsg").textContent = yes
-      ? `¡Estás en la lista, ${r.firstName}! Calienta la voz: ${name} te espera para cantar a todo pulmón.`
-      : `Te vamos a extrañar, ${r.firstName}. Cantaremos una por ti 💔 Si cambian tus planes, aquí mismo puedes actualizar tu respuesta.`;
+      ? `¡Estás en la lista, ${r.firstName}! Prepara tus mejores pasos: ${name} te espera para bailar toda la noche.`
+      : `Te vamos a extrañar, ${r.firstName}. Bailaremos una por ti 💔 Si cambian tus planes, aquí mismo puedes actualizar tu respuesta.`;
 
     const song = $("#passSong");
     song.hidden = !(yes && r.song);
-    song.textContent = yes && r.song ? `🎶 Tu pedido: “${r.song}” — ya va para el DJ` : "";
+    song.textContent = yes && r.song ? `🪩 Para la pista: “${r.song}” — ya se la pasamos al DJ` : "";
 
     const meta = $("#passMeta");
     meta.replaceChildren();
