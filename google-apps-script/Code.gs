@@ -15,6 +15,7 @@
  */
 
 const CONFIG = {
+  SPREADSHEET_ID: '19KnMcRsxcUHC2EP9jRaOUc6xBEyzpbyvVsTqLvEd1G8', // hoja de invitados de Cynthia
   SHEET_NAME: 'Respuestas',
   SUMMARY_NAME: 'Resumen',
   MAX_PER_MINUTE: 40,     // envíos totales por minuto antes de pedir que reintenten
@@ -77,7 +78,7 @@ function doGet() {
  * para crear las pestañas "Respuestas" y "Resumen" con formato.
  */
 function setup() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = ss_();
   const sheet = getSheet_();
 
   let sum = ss.getSheetByName(CONFIG.SUMMARY_NAME);
@@ -100,8 +101,13 @@ function setup() {
 
 /* ------------------------------ helpers ------------------------------ */
 
+function ss_() {
+  return CONFIG.SPREADSHEET_ID ? SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID) : SpreadsheetApp.getActive();
+}
+
+
 function getSheet_() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = ss_();
   let sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(CONFIG.SHEET_NAME);
