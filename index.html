@@ -74,9 +74,11 @@
         Una noche mágica de pura diversión para bailar, reír y disfrutar juntos. ¡No te la puedes perder!
       </p>
 
-      <div class="eq reveal" aria-hidden="true">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
+      <a class="nowplaying reveal" id="musicBtn" href="#" target="_blank" rel="noopener">
+        <span class="np__disc" aria-hidden="true"></span>
+        <span class="np__txt"><small>Dale play ▶</small><b id="musicLabel">—</b></span>
+        <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      </a>
 
       <div class="countdown reveal" id="countdown" role="timer" aria-label="Cuenta regresiva para la fiesta">
         <div class="cd"><b id="cdD">00</b><small>días</small></div>
@@ -138,7 +140,7 @@
       <span class="tape" aria-hidden="true"></span>
       <span class="gold-star" aria-hidden="true">★</span>
 
-      <h2 class="signup__title" id="rsvpTitle">Sign-up sheet</h2>
+      <h2 class="signup__title" id="rsvpTitle">Confirma tu asistencia</h2>
       <p class="signup__sub">Anota tu nombre en la lista antes del <b id="deadline">—</b>.</p>
 
       <form id="rsvpForm" novalidate autocomplete="on">
@@ -179,7 +181,7 @@
         <p class="form-msg" id="formMsg" role="alert" aria-live="assertive"></p>
 
         <button class="btn btn--red btn--block" id="submitBtn" type="submit">
-          <span class="btn__txt">Firmar la lista ★</span>
+          <span class="btn__txt">Confirmar ★</span>
           <span class="btn__spin" aria-hidden="true"></span>
         </button>
 
