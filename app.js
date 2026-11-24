@@ -238,7 +238,7 @@
     } catch (err) {
       msg.textContent = ERRORS[err.code] ||
         (err.name === "AbortError" ? "La conexión está lenta. Revisa tu señal e intenta de nuevo." :
-         "No pudimos guardar tu respuesta. Revisa tu conexión e intenta de nuevo 🙏");
+         "No pudimos guardar tu respuesta. Revisa tu conexión e intenta de nuevo 🙏 (" + (err.code || err.name || "error") + ")");
     } finally {
       btn.disabled = false;
       btn.classList.remove("is-loading");
