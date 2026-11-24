@@ -56,11 +56,5 @@ window.INVITE_CONFIG = {
     "Rehab",
     "Little Things",
     "Toxic",
-    "Cómo te atreves",
-    "Besos en guerra",
-    "Mi nuevo vicio",
-    "Yo contigo, tú conmigo",
-    "Bajo la mesa",
-    "Cuando nadie ve",
   ],
 };
