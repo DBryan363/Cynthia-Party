@@ -38,12 +38,6 @@ window.INVITE_CONFIG = {
   // Déjala vacía para probar en "modo demo" (no guarda nada, solo simula).
   sheetsEndpoint: "",
 
-  // Canción para el botón "Dale play" (abre Spotify)
-  music: {
-    label: "Morat · Besos en guerra",
-    url: "https://open.spotify.com/search/Morat%20Besos%20en%20guerra",
-  },
-
   // Sugerencias para el campo "¿Qué canción quieres bailar?"
   songs: [
     "Don't Stop Believin'",

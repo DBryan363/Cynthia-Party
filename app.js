@@ -49,13 +49,6 @@
     "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.venue?.mapsQuery || C.venue?.address || C.venue?.name || "");
   $("#mapsBtn").href = mapsHref;
 
-  if (C.music?.url) {
-    $("#musicBtn").href = C.music.url;
-    $("#musicLabel").textContent = C.music.label || "Escuchar";
-  } else {
-    $("#musicBtn").hidden = true;
-  }
-
   // Saludo personalizado: comparte el link como …/?invitado=Ana
   const params = new URLSearchParams(location.search);
   const guestParam = clean(params.get("invitado") || params.get("para") || "", 30);
