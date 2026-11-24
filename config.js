@@ -27,8 +27,8 @@ window.INVITE_CONFIG = {
 
   // Dress code
   dressCode: {
-    title: "Noche mágica",
-    detail: "Toques de rojo, dorado o negro y algo que brille ✨ Si quieres, un guiño a tu fandom favorito.",
+    title: "Rojo, negro y dorado",
+    detail: "Cuadros opcional ✨",
   },
 
   // Fecha límite para confirmar (texto libre, se muestra tal cual)
