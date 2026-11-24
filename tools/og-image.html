@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- Plantilla de la imagen que se ve al compartir el link por WhatsApp.
+     Regenerar: node tools/make-og.js  (lee el nombre desde config.js) -->
+<html lang="es"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;width:1200px;height:630px;overflow:hidden;font-family:"Space Mono",monospace;color:#fff;
+    background:radial-gradient(80% 90% at 50% -10%,#3a1d6e,transparent 60%),radial-gradient(60% 60% at 100% 100%,rgba(229,36,59,.4),transparent 60%),#120c24;
+    display:grid;place-items:center;position:relative}
+  .vinyl{position:absolute;width:470px;height:470px;border-radius:50%;opacity:.75;
+    background:radial-gradient(circle,#e5243b 0 16%,#111 16.5% 100%);box-shadow:0 0 120px rgba(229,36,59,.4)}
+  .wrap{position:relative;text-align:center;line-height:.85}
+  .k{font-size:22px;letter-spacing:.3em;color:#ffc94a;margin-bottom:26px}
+  .the{font-family:"Permanent Marker";color:#ffc94a;font-size:54px;transform:rotate(-6deg) translateX(-120px)}
+  h1{margin:0;font-family:"Bebas Neue";font-weight:400;font-size:220px;text-shadow:0 0 30px rgba(255,201,74,.6),0 0 70px rgba(229,36,59,.6),8px 8px 0 #e5243b}
+  .tour{display:inline-block;margin-top:14px;background:#fff7e8;color:#1b1530;font-family:"Bebas Neue";font-size:58px;letter-spacing:.3em;padding:10px 20px 4px 34px;transform:rotate(-2deg);box-shadow:8px 8px 0 #e5243b}
+  .bar{position:absolute;left:0;right:0;bottom:0;background:#e5243b;border-top:4px solid #ffc94a;font-family:"Bebas Neue";font-size:34px;letter-spacing:.12em;padding:12px 0 6px;white-space:nowrap}
+  .s{position:absolute;color:#ffc94a;font-size:40px}
+</style></head><body>
+<div class="vinyl"></div>
+<span class="s" style="left:120px;top:110px">★</span><span class="s" style="right:150px;top:160px;font-size:28px">★</span><span class="s" style="left:220px;bottom:150px;font-size:24px">✦</span><span class="s" style="right:240px;bottom:130px">★</span>
+<div class="wrap"><div class="k">★ GLEEKS × DIRECTIONERS ★</div><div class="the">The</div><h1 id="n">Valentina</h1><div class="tour">Birthday Tour</div></div>
+<div class="bar">&nbsp;♪ ESTÁS EN LA LISTA VIP ♪ TOCA PARA CONFIRMAR ♪ ESTÁS EN LA LISTA VIP ♪ TOCA PARA CONFIRMAR ♪</div>
+<script src="../config.js"></script>
+<script>document.getElementById('n').textContent=(window.INVITE_CONFIG&&INVITE_CONFIG.celebrant.name)||'Cumple'</script>
+</body></html>
