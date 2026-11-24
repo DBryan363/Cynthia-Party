@@ -32,8 +32,8 @@
 
   /* ---------- Render de datos del evento ---------- */
   const name = clean(C.celebrant?.name, 30) || "Cumpleañer@";
-  $("#celebrantName").textContent = name;
-  document.title = `${name} · The Birthday Tour`;
+  $("#celebrantName").textContent = name + "'s";
+  document.title = `${name}'s Birthday`;
   const age = C.celebrant?.age;
   $("#vinylAge").textContent = age ? String(age) : "★";
 
@@ -115,7 +115,7 @@
     if (!validStart) return;
     const end = new Date(start.getTime() + (C.durationHours || 5) * 3600e3);
     const utc = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-    const title = `${name} · The Birthday Tour 🎉`;
+    const title = `${name}'s Birthday 🎉`;
     const loc = [C.venue?.name, C.venue?.address].filter(Boolean).join(", ");
     const details = `Dress code: ${C.dressCode?.title || ""}. ${C.dressCode?.detail || ""}\n${location.href.split("?")[0]}`;
     const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document;

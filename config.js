@@ -22,7 +22,7 @@ window.INVITE_CONFIG = {
     // Lo que se buscará en Google Maps (puede ser la dirección o el nombre del lugar).
     // Si tienes un enlace exacto de Google Maps, ponlo en mapsUrl y tendrá prioridad.
     mapsQuery: "José Pereira 560, Los Olivos, Lima, Perú",
-    mapsUrl: "",
+    mapsUrl: "https://maps.app.goo.gl/xM7bisZmAAsEdKe6A",
   },
 
   // Dress code
