@@ -63,7 +63,9 @@
   const songs = Array.isArray(C.songs) ? C.songs : [];
   const ticker = $("#ticker");
   const frag = document.createDocumentFragment();
-  for (let k = 0; k < 2; k++) songs.forEach((s) => { const el = document.createElement("span"); el.textContent = s; frag.appendChild(el); });
+  const tickerItems = [`${name}'s Birthday`, `${dateLabel} · ${timeLabel}`, C.venue?.name, C.venue?.address,
+    age ? `${age} años` : "", "Una noche mágica", C.dressCode?.title ? `Dress code: ${C.dressCode.title}` : ""].filter(Boolean);
+  for (let k = 0; k < 4; k++) tickerItems.forEach((s) => { const el = document.createElement("span"); el.textContent = s; frag.appendChild(el); });
   ticker.appendChild(frag);
   const dl = $("#songList");
   songs.forEach((s) => { const o = document.createElement("option"); o.value = s; dl.appendChild(o); });
@@ -81,6 +83,20 @@
     s.style.setProperty("--delay", -Math.random() * 6 + "s");
     s.style.setProperty("--o", (.35 + Math.random() * .55).toFixed(2));
     stars.appendChild(s);
+  }
+
+  /* ---------- Velas flotantes ---------- */
+  const candles = $("#candles");
+  const nC = window.innerWidth < 500 ? 7 : 12;
+  for (let i = 0; i < nC; i++) {
+    const c = document.createElement("span");
+    c.className = "candle";
+    c.style.left = (4 + (i * 92) / nC + Math.random() * 6) + "%";
+    c.style.top = (3 + Math.random() * 42) + "%";
+    c.style.setProperty("--h", 16 + Math.random() * 16 + "px");
+    c.style.setProperty("--d", 4 + Math.random() * 4 + "s");
+    c.style.setProperty("--delay", -Math.random() * 5 + "s");
+    candles.appendChild(c);
   }
 
   /* ---------- Cuenta regresiva ---------- */
@@ -245,6 +261,7 @@
   /* ---------- Pase de agradecimiento ---------- */
   const overlay = $("#thanks");
   const slushColors = ["#ff5fa8", "#4f8dff", "#35d6c4", "#a66bff", "#e5243b"];
+  if (age) $("#passSeal").textContent = String(age);
   let lastFocus = null;
 
   function showThanks(r) {
@@ -255,7 +272,7 @@
     $("#passEyebrow").textContent = yes ? "Backstage pass" : "Gracias por avisar";
     $("#passName").textContent = `${r.firstName} ${r.lastName}`;
     $("#passMsg").textContent = yes
-      ? `¡Estás en la lista, ${r.firstName}! Prepara tus mejores pasos: ${name} te espera para bailar toda la noche.`
+      ? `¡Estás en la lista, ${r.firstName}! Prepara tus mejores pasos (y tu varita ϟ): ${name} te espera para bailar toda la noche.`
       : `Te vamos a extrañar, ${r.firstName}. Bailaremos una por ti 💔 Si cambian tus planes, aquí mismo puedes actualizar tu respuesta.`;
 
     const song = $("#passSong");
@@ -317,10 +334,11 @@
     const host = document.createElement("div");
     host.setAttribute("aria-hidden", "true");
     host.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden";
-    const colors = ["#ffc94a", "#e5243b", "#ffffff", "#4f8dff", "#ff5fa8"];
+    const colors = ["#ffc94a", "#e5243b", "#ffffff", "#f3d08a", "#ff5fa8"];
+    const glyphs = ["★", "✦", "ϟ", "★", "♪"];
     for (let i = 0; i < 46; i++) {
       const p = document.createElement("span");
-      p.textContent = i % 3 ? "★" : "♪";
+      p.textContent = glyphs[i % glyphs.length];
       const x = Math.random() * 100, dx = (Math.random() - .5) * 120, rot = (Math.random() - .5) * 720;
       p.style.cssText = `position:absolute;left:${x}%;top:-24px;font-size:${10 + Math.random() * 16}px;color:${colors[i % colors.length]}`;
       host.appendChild(p);

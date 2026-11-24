@@ -6,7 +6,7 @@ window.INVITE_CONFIG = {
   // Quién cumple
   celebrant: {
     name: "Cynthia",            // Nombre que aparece en grande
-    age: 30,                    // Pon null si no quieres mostrar la edad
+    age: 29,                    // Pon null si no quieres mostrar la edad
   },
 
   // Fecha y hora (formato ISO con la zona horaria de la fiesta)
@@ -27,8 +27,8 @@ window.INVITE_CONFIG = {
 
   // Dress code
   dressCode: {
-    title: "Pop Star 2012",
-    detail: "Rojo, negro o dorado. Chaquetas varsity, camisas a cuadros, bandanas y mucho brillo ✨",
+    title: "Noche mágica",
+    detail: "Toques de rojo, dorado o negro y algo que brille ✨ Si quieres, un guiño a tu fandom favorito.",
   },
 
   // Fecha límite para confirmar (texto libre, se muestra tal cual)
@@ -38,7 +38,7 @@ window.INVITE_CONFIG = {
   // Déjala vacía para probar en "modo demo" (no guarda nada, solo simula).
   sheetsEndpoint: "",
 
-  // Canciones para la cinta que se desliza arriba y sugerencias del formulario
+  // Sugerencias para el campo "¿Qué canción quieres bailar?"
   songs: [
     "Don't Stop Believin'",
     "What Makes You Beautiful",
@@ -56,5 +56,11 @@ window.INVITE_CONFIG = {
     "Rehab",
     "Little Things",
     "Toxic",
+    "Cómo te atreves",
+    "Besos en guerra",
+    "Mi nuevo vicio",
+    "Yo contigo, tú conmigo",
+    "Bajo la mesa",
+    "Cuando nadie ve",
   ],
 };
