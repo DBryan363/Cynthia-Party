@@ -36,7 +36,7 @@ window.INVITE_CONFIG = {
 
   // URL de la Web App de Google Apps Script (ver README → "Conectar Google Sheets").
   // Déjala vacía para probar en "modo demo" (no guarda nada, solo simula).
-  sheetsEndpoint: "",
+  sheetsEndpoint: "https://script.google.com/macros/s/AKfycbzX1BlC2XqdV-_fRv4Io7eelAGpPRtuwzxSwXjhmLyFYV2Tq65nwA2640S3hcKkIxrF/exec",
 
   // Sugerencias para el campo "¿Qué canción quieres bailar?"
   songs: [
