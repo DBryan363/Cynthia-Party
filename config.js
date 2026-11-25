@@ -19,7 +19,7 @@ window.INVITE_CONFIG = {
       id: "jue",
       label: "Noche 1",
       emoji: "🌙",
-      startISO: "2026-11-26T22:00:00-05:00", // 10:00 PM
+      startISO: "2026-11-26T23:00:00-05:00", // 11:00 PM
       venue: {
         name: "Versus",
         address: "Lince, Lima",
