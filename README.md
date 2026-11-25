@@ -17,7 +17,7 @@ Invitación web *mobile-first* para cumpleaños con estética de **pase VIP de c
 - Entrada VIP con fecha, hora, lugar y dress code, botón **Cómo llegar** (Google Maps) y **Agendar** (Google Calendar en Android, archivo de calendario en iPhone).
 - Formulario "Sign-up sheet": nombre, apellido, ¿asistirá?, canción opcional (con sugerencias). Si responde "No podré", el campo de canción se oculta.
 - Agradecimiento personalizado: un pase backstage con su nombre que cae con "slushie" de color y confeti de estrellas (o un mensaje cariñoso si no puede ir).
-- Botón fijo "Confirmar asistencia" en el celular; si la persona vuelve a abrir el link, cambia a **"Ver mi pase"** y puede actualizar su respuesta.
+- Botón fijo "Confirmar asistencia" en el celular. Después de confirmar, el formulario se limpia para anotar a otro acompañante.
 - **Links personalizados**: `https://tu-sitio/?invitado=Ana` muestra "¡Ana, tu nombre está en la lista VIP!" y le prellena el nombre.
 - Respeta "reducir movimiento" del sistema y es accesible con teclado y lectores de pantalla.
 
@@ -52,7 +52,7 @@ Para cerrar las confirmaciones, pon `CLOSED: true` en `Code.gs` y crea una nueva
 
 - **No hay credenciales en la página.** La URL `/exec` solo permite *enviar* una respuesta; no permite leer la hoja (`doGet` no devuelve datos). La lista de invitados solo la ves tú en tu Google Sheet.
 - El servidor valida y recorta cada campo, bloquea la inyección de fórmulas (`=`, `+`, `-`, `@`), tiene campo trampa anti-bots, tiempo mínimo de llenado y límite de envíos por minuto.
-- Si alguien responde dos veces con el mismo nombre y apellido, **se actualiza su fila** (columna *Cambios*) en lugar de duplicarla.
+- Las respuestas son **fijas**: si alguien intenta registrar un nombre y apellido que ya está en la lista, no se cambia nada y la página avisa que ya se registró.
 - En el navegador del invitado solo se guarda su propia respuesta, para mostrarle su pase al volver.
 
 ## 3. Publicar en GitHub Pages

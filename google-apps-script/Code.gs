@@ -10,8 +10,8 @@
  *  - Validación y límites de longitud en el servidor.
  *  - Neutraliza "inyección de fórmulas" (=, +, -, @) en las celdas.
  *  - Campo trampa (honeypot), tiempo mínimo de llenado y límite de envíos por minuto.
- *  - Si un invitado vuelve a responder con el mismo nombre y apellido,
- *    se ACTUALIZA su fila en vez de duplicarla.
+ *  - Las respuestas son FIJAS: si alguien intenta registrar un nombre y apellido
+ *    que ya está en la lista, no se cambia nada y la página avisa "ya se registró".
  */
 
 const CONFIG = {
@@ -55,13 +55,8 @@ function doPost(e) {
       const now = new Date();
       const row = findRowByKey_(sheet, key);
 
-      if (row) {
-        const prevChanges = Number(sheet.getRange(row, 7).getValue()) || 0;
-        sheet.getRange(row, 1, 1, 4).setValues([[safe_(firstName), safe_(lastName), attending, safe_(song)]]);
-        sheet.getRange(row, 6, 1, 2).setValues([[now, prevChanges + 1]]);
-      } else {
-        sheet.appendRow([safe_(firstName), safe_(lastName), attending, safe_(song), now, now, 0, key]);
-      }
+      if (row) return json_({ ok: false, error: 'duplicate' }); // ya registrado: no se modifica
+      sheet.appendRow([safe_(firstName), safe_(lastName), attending, safe_(song), now, now, 0, key]);
     } finally {
       lock.releaseLock();
     }

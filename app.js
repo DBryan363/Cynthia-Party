@@ -7,19 +7,21 @@
 
   const C = window.INVITE_CONFIG || {};
   const $ = (sel) => document.querySelector(sel);
-  const STORE_KEY = "birthdayTour.rsvp.v1";
+  const STORE_KEY = "birthdayTour.demoList.v2"; // solo se usa en modo demo (sin Google Sheets)
   const loadedAt = Date.now();
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------- Utilidades ---------- */
   const store = {
-    get() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || null; } catch { return null; } },
-    set(v) { try { localStorage.setItem(STORE_KEY, JSON.stringify(v)); } catch { /* modo privado */ } },
+    get() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; } },
+    add(k) { try { localStorage.setItem(STORE_KEY, JSON.stringify([...this.get(), k])); } catch { /* modo privado */ } },
   };
   const clean = (s, max) => String(s || "").replace(/\s+/g, " ").trim().slice(0, max);
   const titleCase = (s) => s.toLowerCase().replace(/(^|[\s'-])(\p{L})/gu, (m, a, b) => a + b.toUpperCase());
   const hash = (s) => { let h = 7; for (const ch of s) h = (h * 31 + ch.codePointAt(0)) >>> 0; return h; };
   const pad = (n) => String(n).padStart(2, "0");
+  // Misma clave que usa Code.gs para detectar nombres repetidos
+  const nameKey = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9ñ ]/g, "").replace(/\s+/g, " ").trim();
 
   const tz = C.timeZone || undefined;
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -221,8 +223,6 @@
     label.append(input, span);
     attendField.appendChild(label);
   });
-  // Respuesta guardada con la versión anterior ("si" = la única noche que había: el viernes)
-  const normAttending = (v) => v === "si" ? (byId("vie") || events[events.length - 1]).id : v;
   const nightsFor = (v) => v === "ambos" ? events : events.filter((e) => e.id === v);
 
   form.addEventListener("change", (e) => {
@@ -268,6 +268,9 @@
     if (!endpoint) {
       console.warn("[Birthday Tour] Modo demo: configura sheetsEndpoint en config.js para guardar respuestas.");
       await new Promise((r) => setTimeout(r, 900));
+      const key = nameKey(d.firstName + " " + d.lastName);
+      if (store.get().includes(key)) return { ok: false, error: "duplicate" };
+      store.add(key);
       return { ok: true, demo: true };
     }
     const ctrl = new AbortController();
@@ -294,6 +297,14 @@
     closed: "Las confirmaciones ya cerraron. Escríbele directamente a quien organiza.",
   };
 
+  function resetForm() {
+    form.reset();
+    songField.classList.remove("is-hidden");
+    form.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+    msg.textContent = "";
+    msg.classList.remove("is-info");
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (btn.disabled) return;
@@ -303,14 +314,18 @@
     btn.disabled = true;
     btn.classList.add("is-loading");
     msg.textContent = "";
+    msg.classList.remove("is-info");
     try {
       const r = await send(d);
       if (!r.ok) throw Object.assign(new Error(r.error || "error"), { code: r.error });
-      const saved = { firstName: d.firstName, lastName: d.lastName, attending: d.attending, song: d.song, at: Date.now() };
-      store.set(saved);
-      syncReturning(saved);
-      showThanks(saved);
+      resetForm(); // listo para anotar a otra persona
+      showThanks({ firstName: d.firstName, lastName: d.lastName, attending: d.attending, song: d.song });
     } catch (err) {
+      if (err.code === "duplicate") {
+        msg.classList.add("is-info");
+        msg.textContent = `✅ ${d.firstName} ${d.lastName} ya se registró en la lista.`;
+        return;
+      }
       msg.textContent = ERRORS[err.code] ||
         (err.name === "AbortError" ? "La conexión está lenta. Revisa tu señal e intenta de nuevo." :
          "No pudimos guardar tu respuesta. Revisa tu conexión e intenta de nuevo 🙏 (" + (err.code || err.name || "error") + ")");
@@ -327,7 +342,7 @@
   let lastFocus = null;
 
   function showThanks(r) {
-    const nights = nightsFor(normAttending(r.attending));
+    const nights = nightsFor(r.attending);
     const yes = nights.length > 0;
     const both = multi && nights.length === events.length;
     const when = !multi ? "" : both ? " las dos noches" : ` el ${nights[0]?.weekday.toLowerCase()}`;
@@ -338,7 +353,7 @@
     $("#passName").textContent = `${r.firstName} ${r.lastName}`;
     $("#passMsg").textContent = yes
       ? `¡Estás en la lista, ${r.firstName}! Prepara tus mejores pasos (y tu varita ϟ): ${name} te espera${when} para bailar sin parar.`
-      : `Te vamos a extrañar, ${r.firstName}. Bailaremos una por ti 💔 Si cambian tus planes, aquí mismo puedes actualizar tu respuesta.`;
+      : `Te vamos a extrañar, ${r.firstName}. Bailaremos una por ti 💔 Gracias por avisar.`;
 
     const song = $("#passSong");
     song.hidden = !(yes && r.song);
@@ -381,22 +396,11 @@
   overlay.addEventListener("click", (e) => { if (e.target === overlay) hideThanks(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !overlay.hidden) hideThanks(); });
   $("#editBtn").addEventListener("click", () => {
-    const r = store.get();
-    if (r) prefill(r);
+    resetForm();
     hideThanks();
     $("#rsvp").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
     setTimeout(() => $("#firstName").focus({ preventScroll: true }), 450);
   });
-
-  function prefill(r) {
-    $("#firstName").value = r.firstName || "";
-    $("#lastName").value = r.lastName || "";
-    const v = normAttending(r.attending);
-    const radio = [...form.querySelectorAll('input[name="attending"]')].find((el) => el.value === v);
-    if (radio) radio.checked = true;
-    $("#song").value = r.song || "";
-    songField.classList.toggle("is-hidden", r.attending === "no");
-  }
 
   /* Confeti de estrellas (ligero, sin librerías) */
   function confetti() {
@@ -420,23 +424,7 @@
     setTimeout(() => host.remove(), 4500);
   }
 
-  /* ---------- Invitado que vuelve ---------- */
   const dock = $("#dock");
-  function syncReturning(r) {
-    if (!r) return;
-    dock.querySelector("span").textContent = "Ver mi pase";
-    $("#submitBtn .btn__txt").textContent = "Actualizar respuesta ★";
-  }
-  const previous = store.get();
-  if (previous) {
-    syncReturning(previous);
-    if (!guestParam) prefill(previous);
-  }
-  dock.addEventListener("click", (e) => {
-    const r = store.get();
-    if (r) { e.preventDefault(); showThanks(r); }
-  });
-
 
   /* ---------- CTA fija: ocultar cuando el formulario está visible ---------- */
   let rsvpVisible = false;
