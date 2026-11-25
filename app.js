@@ -139,7 +139,7 @@
   const frag = document.createDocumentFragment();
   const tickerItems = [`${name}'s Birthday`,
     ...events.map((e) => [e.short + " " + e.dateMid.split(" ")[1], e.venue.name, e.timeTBD ? "" : e.timeLabel].filter(Boolean).join(" · ")),
-    age ? `${age} años` : "", multi ? "Dos noches mágicas" : "Una noche mágica",
+    age ? `${age} años` : "", "Pura magia",
     C.dressCode?.title ? `Dress code: ${C.dressCode.title}` : ""].filter(Boolean);
   for (let k = 0; k < 4; k++) tickerItems.forEach((s) => { const el = document.createElement("span"); el.textContent = s; frag.appendChild(el); });
   ticker.appendChild(frag);
