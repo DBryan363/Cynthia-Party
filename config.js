@@ -18,7 +18,7 @@ window.INVITE_CONFIG = {
     {
       id: "jue",
       label: "Noche 1",
-      emoji: "🪄",
+      emoji: "🌙",
       startISO: "2026-11-26T22:00:00-05:00", // ⚠️ hora provisional, falta confirmarla
       timeTBD: true,
       venue: {
@@ -49,9 +49,6 @@ window.INVITE_CONFIG = {
     title: "Rojo, negro y dorado",
     detail: "Cuadros opcional ✨",
   },
-
-  // Fecha límite para confirmar (texto libre, se muestra tal cual)
-  rsvpDeadline: "25 de noviembre",
 
   // URL de la Web App de Google Apps Script (ver README → "Conectar Google Sheets").
   // Déjala vacía para probar en "modo demo" (no guarda nada, solo simula).

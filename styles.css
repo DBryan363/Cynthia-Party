@@ -397,6 +397,7 @@ button, input { font: inherit; color: inherit; }
   color: var(--red);
 }
 .signup__sub { margin: 4px 0 14px; font-size: 14px; color: rgba(27,21,48,.75); padding-right: 40px; }
+.signup__sub b { display: block; color: var(--red-dk); font-size: 15px; }
 
 #rsvpForm { display: grid; gap: 14px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }

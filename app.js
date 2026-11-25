@@ -59,7 +59,6 @@
   document.title = `${name}'s Birthday`;
   const age = C.celebrant?.age;
   $("#vinylAge").textContent = age ? String(age) : "★";
-  $("#deadline").textContent = C.rsvpDeadline || "la fiesta";
   if (!multi) $("#ticketsKicker").textContent = "Tu pase";
 
   /* ---------- Calendario (enlace por noche) ---------- */

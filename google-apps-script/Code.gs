@@ -92,7 +92,7 @@ function setup() {
   sum.getRange('A1:B1').setValues([["🎉 Cynthia's Birthday", '']]).setFontWeight('bold').setFontSize(14);
   const C_ = R + '!C2:C';
   sum.getRange('A3:B8').setValues([
-    ['🪄 Van el jueves', '=COUNTIF(' + C_ + ',"Jueves")+COUNTIF(' + C_ + ',"Ambas")'],
+    ['🌙 Van el jueves', '=COUNTIF(' + C_ + ',"Jueves")+COUNTIF(' + C_ + ',"Ambas")'],
     ['🎉 Van el viernes', '=COUNTIF(' + C_ + ',"Viernes")+COUNTIF(' + C_ + ',"Ambas")+COUNTIF(' + C_ + ',"Sí")'],
     ['✨ Van a las dos', '=COUNTIF(' + C_ + ',"Ambas")'],
     ['💔 No asistirán', '=COUNTIF(' + C_ + ',"No")'],
