@@ -19,13 +19,16 @@ window.INVITE_CONFIG = {
       id: "jue",
       label: "Noche 1",
       emoji: "🌙",
-      startISO: "2026-11-26T22:00:00-05:00", // ⚠️ hora provisional, falta confirmarla
-      timeTBD: true,
+      startISO: "2026-11-26T22:00:00-05:00", // 10:00 PM
       venue: {
         name: "Versus",
         address: "Lince, Lima",
         mapsQuery: "Versus, Lince, Lima, Perú",
-        mapsUrl: "",                 // pega aquí el link exacto de Google Maps cuando lo tengas
+        mapsUrl: "https://maps.app.goo.gl/Px7685VJrmXGP8dr6",
+      },
+      dressCode: {
+        title: "Sin dress code",
+        detail: "Solo ven decente 😉",
       },
     },
     {
@@ -44,7 +47,7 @@ window.INVITE_CONFIG = {
   durationHours: 5,             // Para el botón "Agendar" (calendario)
   timeZone: "America/Lima",     // Zona horaria para mostrar fecha/hora
 
-  // Dress code (para todas las noches, salvo que una noche tenga el suyo)
+  // Dress code general (lo usan las noches que no tienen uno propio: el viernes)
   dressCode: {
     title: "Rojo, negro y dorado",
     detail: "Cuadros opcional ✨",
