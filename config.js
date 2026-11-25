@@ -35,7 +35,7 @@ window.INVITE_CONFIG = {
       id: "vie",
       label: "Noche 2",
       emoji: "🎉",
-      startISO: "2026-11-27T23:00:00-05:00",
+      startISO: "2026-11-27T22:00:00-05:00", // 10:00 PM
       venue: {
         name: "José Pereira 560",
         address: "Los Olivos, Lima",
