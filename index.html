@@ -153,10 +153,9 @@
           <!-- Las opciones se generan desde config.js: una por noche + "las dos" + "no podré" -->
         </fieldset>
 
-        <label class="line line--song" id="songField">
-          <span>¿Qué canción quieres bailar? <em>(opcional)</em></span>
-          <input name="song" id="song" type="text" maxlength="80" list="songList" placeholder="Ej: Don't Stop Believin'" enterkeyhint="send" autocomplete="off">
-          <datalist id="songList"></datalist>
+        <label class="line line--note">
+          <span>Un mensaje o recomendación para <b class="js-name">la cumpleañera</b> <em>(opcional)</em></span>
+          <textarea name="comment" id="comment" rows="2" maxlength="300" placeholder="Ej: ¡Feliz cumple! Que suene mucho reggaetón 💃" enterkeyhint="done"></textarea>
         </label>
 
         <!-- Campo trampa anti-bots: los humanos no lo ven -->
@@ -195,7 +194,7 @@
       <p class="pass__eyebrow" id="passEyebrow">Backstage pass</p>
       <h2 class="pass__name" id="passName">—</h2>
       <p class="pass__msg" id="passMsg"></p>
-      <p class="pass__song" id="passSong" hidden></p>
+      <p class="pass__note" id="passNote" hidden></p>
       <div class="pass__meta" id="passMeta"></div>
       <span class="seal" aria-hidden="true" id="passSeal">29</span>
       <div class="pass__actions">

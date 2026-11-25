@@ -1,8 +1,11 @@
 /**
- * The Birthday Tour — receptor de confirmaciones (Google Apps Script)
+ * Cynthia's Birthday — receptor de confirmaciones (Google Apps Script)
  * ------------------------------------------------------------------
  * Pega este archivo en Extensiones → Apps Script de tu Google Sheet.
  * Instrucciones completas en el README del proyecto.
+ *
+ * Qué guarda (pestaña "Respuestas"):
+ *   Nombre · Apellido · Asistirá (Jueves / Viernes / Ambas / No) · Comentario · Fecha de registro
  *
  * Seguridad:
  *  - La hoja sigue siendo PRIVADA: la página solo puede ESCRIBIR una respuesta,
@@ -25,9 +28,11 @@ const CONFIG = {
 
 // Opciones que envía la invitación → lo que se escribe en la columna "Asistirá".
 // Los códigos (jue, vie) deben coincidir con los "id" de config.js → events.
-const NIGHTS = { jue: 'Jueves', vie: 'Viernes', ambos: 'Ambas', no: 'No', si: 'Viernes' };
+const NIGHTS = { jue: 'Jueves', vie: 'Viernes', ambos: 'Ambas', no: 'No' };
 
-const HEADERS = ['Nombre', 'Apellido', 'Asistirá', 'Canción', 'Primera respuesta', 'Última actualización', 'Cambios', 'Clave'];
+// La columna "Clave" (nombre normalizado) va oculta y sirve para detectar repetidos.
+const HEADERS = ['Nombre', 'Apellido', 'Asistirá', 'Comentario', 'Fecha de registro', 'Clave'];
+const KEY_COL = HEADERS.indexOf('Clave') + 1;
 
 function doPost(e) {
   try {
@@ -42,7 +47,7 @@ function doPost(e) {
     const firstName = cleanText_(body.firstName, 40);
     const lastName = cleanText_(body.lastName, 40);
     const attending = Object.prototype.hasOwnProperty.call(NIGHTS, body.attending) ? NIGHTS[body.attending] : '';
-    const song = attending && attending !== 'No' ? cleanText_(body.song, 80) : '';
+    const comment = cleanText_(body.comment, 300);
 
     if (firstName.length < 2 || lastName.length < 2 || !attending) return json_({ ok: false, error: 'invalid' });
     if (!rateLimitOk_()) return json_({ ok: false, error: 'busy' });
@@ -52,11 +57,8 @@ function doPost(e) {
     try {
       const sheet = getSheet_();
       const key = normalizeKey_(firstName + ' ' + lastName);
-      const now = new Date();
-      const row = findRowByKey_(sheet, key);
-
-      if (row) return json_({ ok: false, error: 'duplicate' }); // ya registrado: no se modifica
-      sheet.appendRow([safe_(firstName), safe_(lastName), attending, safe_(song), now, now, 0, key]);
+      if (findRowByKey_(sheet, key)) return json_({ ok: false, error: 'duplicate' }); // ya registrado: no se modifica
+      sheet.appendRow([safe_(firstName), safe_(lastName), attending, safe_(comment), new Date(), key]);
     } finally {
       lock.releaseLock();
     }
@@ -69,7 +71,7 @@ function doPost(e) {
 
 /** Comprobación de salud. No expone ningún dato de invitados. */
 function doGet() {
-  return json_({ ok: true, service: 'birthday-tour-rsvp' });
+  return json_({ ok: true, service: 'birthday-rsvp' });
 }
 
 /**
@@ -78,27 +80,27 @@ function doGet() {
  */
 function setup() {
   const ss = ss_();
-  const sheet = getSheet_();
+  getSheet_();
 
   let sum = ss.getSheetByName(CONFIG.SUMMARY_NAME);
   if (!sum) sum = ss.insertSheet(CONFIG.SUMMARY_NAME);
   sum.clear();
   const R = "'" + CONFIG.SHEET_NAME + "'";
-  sum.getRange('A1:B1').setValues([["🎉 Cynthia's Birthday", '']]).setFontWeight('bold').setFontSize(14);
   const C_ = R + '!C2:C';
+  sum.getRange('A1:B1').setValues([["🎉 Cynthia's Birthday", '']]).setFontWeight('bold').setFontSize(14);
   sum.getRange('A3:B8').setValues([
     ['🌙 Van el jueves', '=COUNTIF(' + C_ + ',"Jueves")+COUNTIF(' + C_ + ',"Ambas")'],
-    ['🎉 Van el viernes', '=COUNTIF(' + C_ + ',"Viernes")+COUNTIF(' + C_ + ',"Ambas")+COUNTIF(' + C_ + ',"Sí")'],
+    ['🎉 Van el viernes', '=COUNTIF(' + C_ + ',"Viernes")+COUNTIF(' + C_ + ',"Ambas")'],
     ['✨ Van a las dos', '=COUNTIF(' + C_ + ',"Ambas")'],
     ['💔 No asistirán', '=COUNTIF(' + C_ + ',"No")'],
     ['📝 Total respuestas', '=COUNTA(' + R + '!A2:A)'],
-    ['🎶 Canciones pedidas', '=COUNTA(' + R + '!D2:D)'],
+    ['💌 Comentarios', '=COUNTA(' + R + '!D2:D)'],
   ]);
-  sum.getRange('A10:C10').setValues([['Lista de confirmados', 'Noche', 'Canción']]).setFontWeight('bold');
+  sum.getRange('A10:C10').setValues([['Lista de confirmados', 'Noche', 'Comentario']]).setFontWeight('bold');
   sum.getRange('A11').setFormula('=IFERROR(SORT(FILTER({' + R + '!A2:A&" "&' + R + '!B2:B,' + C_ + ',' + R + '!D2:D},' + C_ + '<>"No",' + C_ + '<>""),1,TRUE),"Aún nadie")');
   sum.setColumnWidth(1, 260);
   sum.setColumnWidth(2, 120);
-  sum.setColumnWidth(3, 260);
+  sum.setColumnWidth(3, 360);
   ss.setActiveSheet(sum);
 }
 
@@ -108,7 +110,6 @@ function ss_() {
   return CONFIG.SPREADSHEET_ID ? SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID) : SpreadsheetApp.getActive();
 }
 
-
 function getSheet_() {
   const ss = ss_();
   let sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
@@ -117,9 +118,11 @@ function getSheet_() {
     sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
       .setFontWeight('bold').setBackground('#1b1530').setFontColor('#ffc94a');
     sheet.setFrozenRows(1);
-    sheet.getRange('E:F').setNumberFormat('dd/mm/yyyy hh:mm');
-    sheet.hideColumns(8); // la clave es interna
-    sheet.setColumnWidths(1, 4, 170);
+    sheet.getRange('E:E').setNumberFormat('dd/mm/yyyy hh:mm');
+    sheet.hideColumns(KEY_COL); // la clave es interna
+    sheet.setColumnWidths(1, 3, 150);
+    sheet.setColumnWidth(4, 320);
+    sheet.setColumnWidth(5, 140);
   }
   return sheet;
 }
@@ -156,7 +159,7 @@ function normalizeKey_(s) {
 function findRowByKey_(sheet, key) {
   const last = sheet.getLastRow();
   if (last < 2) return 0;
-  const keys = sheet.getRange(2, 8, last - 1, 1).getValues();
+  const keys = sheet.getRange(2, KEY_COL, last - 1, 1).getValues();
   for (let i = 0; i < keys.length; i++) if (keys[i][0] === key) return i + 2;
   return 0;
 }

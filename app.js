@@ -134,7 +134,6 @@
   }
 
   /* ---------- Ticker y sugerencias de canciones ---------- */
-  const songs = Array.isArray(C.songs) ? C.songs : [];
   const ticker = $("#ticker");
   const frag = document.createDocumentFragment();
   const tickerItems = [`${name}'s Birthday`,
@@ -143,8 +142,7 @@
     C.dressCode?.title ? `Dress code: ${C.dressCode.title}` : ""].filter(Boolean);
   for (let k = 0; k < 4; k++) tickerItems.forEach((s) => { const el = document.createElement("span"); el.textContent = s; frag.appendChild(el); });
   ticker.appendChild(frag);
-  const dl = $("#songList");
-  songs.forEach((s) => { const o = document.createElement("option"); o.value = s; dl.appendChild(o); });
+  document.querySelectorAll(".js-name").forEach((el) => { el.textContent = name; });
 
   /* ---------- Estrellas de fondo ---------- */
   const stars = $("#stars");
@@ -201,7 +199,6 @@
   const form = $("#rsvpForm");
   const msg = $("#formMsg");
   const btn = $("#submitBtn");
-  const songField = $("#songField");
 
   // Opciones de asistencia: una por noche, "las dos" y "no podré"
   const attendField = $("#attendField");
@@ -228,7 +225,6 @@
   form.addEventListener("change", (e) => {
     if (e.target.name === "attending") {
       $("#attendField").classList.remove("is-invalid");
-      songField.classList.toggle("is-hidden", e.target.value === "no");
     }
   });
   form.addEventListener("input", (e) => {
@@ -242,7 +238,7 @@
       firstName: titleCase(clean(fd.get("firstName"), 40)),
       lastName: titleCase(clean(fd.get("lastName"), 40)),
       attending: fd.get("attending") || "",
-      song: fd.get("attending") && fd.get("attending") !== "no" ? clean(fd.get("song"), 80) : "",
+      comment: clean(fd.get("comment"), 300),
       website: clean(fd.get("website"), 100), // honeypot
     };
   }
@@ -299,7 +295,6 @@
 
   function resetForm() {
     form.reset();
-    songField.classList.remove("is-hidden");
     form.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
     msg.textContent = "";
     msg.classList.remove("is-info");
@@ -319,7 +314,7 @@
       const r = await send(d);
       if (!r.ok) throw Object.assign(new Error(r.error || "error"), { code: r.error });
       resetForm(); // listo para anotar a otra persona
-      showThanks({ firstName: d.firstName, lastName: d.lastName, attending: d.attending, song: d.song });
+      showThanks({ firstName: d.firstName, lastName: d.lastName, attending: d.attending, comment: d.comment });
     } catch (err) {
       if (err.code === "duplicate") {
         msg.classList.add("is-info");
@@ -355,9 +350,9 @@
       ? `¡Estás en la lista, ${r.firstName}! Prepara tus mejores pasos (y tu varita ϟ): ${name} te espera${when} para bailar sin parar.`
       : `Te vamos a extrañar, ${r.firstName}. Bailaremos una por ti 💔 Gracias por avisar.`;
 
-    const song = $("#passSong");
-    song.hidden = !(yes && r.song);
-    song.textContent = yes && r.song ? `🪩 Para la pista: “${r.song}” — ya se la pasamos al DJ` : "";
+    const note = $("#passNote");
+    note.hidden = !r.comment;
+    note.textContent = r.comment ? `💌 Tu mensaje le llegará a ${name}` : "";
 
     const meta = $("#passMeta");
     meta.replaceChildren();

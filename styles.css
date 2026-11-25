@@ -443,8 +443,17 @@ button, input { font: inherit; color: inherit; }
 .pill--no input:checked + span { background: #ece6ff; color: var(--ink); box-shadow: 3px 3px 0 var(--blue); transform: rotate(1.5deg); }
 .choice.is-invalid .pill span { border-color: var(--red); }
 
-.line--song { transition: opacity .25s, max-height .3s; max-height: 120px; overflow: hidden; }
-.line--song.is-hidden { opacity: 0; max-height: 0; margin-top: -14px; pointer-events: none; }
+.line > span b { font-weight: 700; color: var(--red); }
+.line textarea {
+  width: 100%; min-width: 0; resize: none;
+  border: 0; border-bottom: 2px solid rgba(27,21,48,.35);
+  background: transparent; border-radius: 0;
+  padding: 6px 2px; line-height: 32px;
+  font-family: var(--f-hand); font-size: 19px; color: #1f3a93;
+  transition: border-color .2s;
+}
+.line textarea::placeholder { color: rgba(27,21,48,.3); font-family: var(--f-body); font-size: 15px; }
+.line textarea:focus { outline: none; border-bottom-color: var(--red); }
 
 .hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
@@ -539,7 +548,7 @@ button, input { font: inherit; color: inherit; }
   overflow-wrap: anywhere;
 }
 .pass__msg { margin: 0 0 10px; font-size: 15px; color: rgba(27,21,48,.85); }
-.pass__song {
+.pass__note {
   margin: 0 auto 12px; display: inline-block; max-width: 100%;
   padding: 6px 12px; border-radius: 999px;
   background: rgba(229,36,59,.08); color: var(--red-dk);
