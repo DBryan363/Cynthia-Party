@@ -231,11 +231,28 @@ button, input { font: inherit; color: inherit; }
 .cd b.tick { animation: tick .35s var(--ease); }
 @keyframes tick { from { transform: translateY(-4px); opacity: .4; } }
 .cd small { font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.countdown .live { display: none; }
 .countdown.is-live { grid-template-columns: 1fr; }
+.countdown.is-live .cd { display: none; }
+.countdown.is-live .live { display: block; }
 .countdown .live {
   font-family: var(--f-display); font-size: 26px; letter-spacing: .1em; color: var(--gold);
   padding: 8px; border: 1px solid var(--line); border-radius: 12px;
 }
+
+.cd-cap {
+  margin: -2px 0 0; text-align: center;
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
+}
+.cd-cap:empty { display: none; }
+
+/* ---------- Tickets (uno por noche) ---------- */
+.tickets { display: grid; gap: 12px; }
+.tickets__kicker {
+  margin: 0; text-align: center;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted);
+}
+.tickets__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
 
 /* ---------- Ticket ---------- */
 .ticket {
@@ -276,16 +293,24 @@ button, input { font: inherit; color: inherit; }
 }
 .stub__no { writing-mode: vertical-rl; transform: rotate(180deg); opacity: .7; }
 
-.ticket__head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.ticket__head h2 {
-  margin: 0; font-family: var(--f-mono); font-size: 11px; font-weight: 700;
+.ticket__head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; min-width: 0; }
+.ticket__kind {
+  margin: 0; font-family: var(--f-mono); font-size: 10px; font-weight: 700; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   letter-spacing: .16em; text-transform: uppercase; color: rgba(27,21,48,.65);
 }
 .ticket__badge {
-  font-family: var(--f-serif); font-weight: 700; font-size: 14px; letter-spacing: .1em; line-height: 1;
+  flex: none; text-transform: uppercase;
+  font-family: var(--f-serif); font-weight: 700; font-size: 11px; letter-spacing: .12em; line-height: 1;
   padding: 4px 8px 2px; border-radius: 4px;
   background: var(--wine); color: var(--gold);
 }
+.ticket__day {
+  margin: 0 0 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; line-height: 1;
+}
+.ticket__day b { font-family: var(--f-magic); font-weight: 900; font-size: 27px; color: var(--wine); letter-spacing: .01em; }
+.ticket__day span { font-family: var(--f-display); font-size: 22px; letter-spacing: .06em; color: var(--red); }
+.field dd.is-tbd { font-size: 20px; color: rgba(27,21,48,.55); padding-top: 2px; }
 .ticket__grid { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
 .field { margin: 0; }
 .field--wide { grid-column: 1 / -1; }
@@ -300,6 +325,10 @@ button, input { font: inherit; color: inherit; }
   color: rgba(27,21,48,.72);
 }
 .field--dress dd { position: relative; }
+/* Segunda noche: inclinación opuesta y banda distinta para diferenciarlas */
+.ticket:nth-child(2n) { transform: rotate(.6deg); }
+.ticket:nth-child(2n+1) .ticket__main::before { background: repeating-linear-gradient(180deg, var(--wine) 0 12px, var(--gold) 12px 24px); }
+.ticket:nth-child(2n+1) .ticket__badge { background: var(--ink); }
 .ticket__actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-top: 14px; }
 .ticket__actions .btn { padding: 0 8px; font-size: 14px; min-width: 0; }
 @media (max-width: 350px) { .ticket__actions .btn { font-size: 13px; gap: 5px; } .ticket__actions .btn svg { width: 15px; height: 15px; } }
@@ -398,14 +427,17 @@ button, input { font: inherit; color: inherit; }
 .pill { position: relative; cursor: pointer; }
 .pill input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .pill span {
-  display: grid; place-items: center; min-height: 50px; padding: 6px 8px;
+  display: grid; place-items: center; align-content: center; gap: 1px; min-height: 50px; padding: 6px 8px;
   border-radius: 12px; border: 2px solid var(--ink);
   font-weight: 800; font-size: 15px; text-align: center;
   background: #fff;
   transition: transform .18s var(--ease), background .2s, color .2s, box-shadow .2s;
 }
+.pill small { display: block; font-weight: 600; font-size: 11px; line-height: 1.2; opacity: .62; }
 .pill input:focus-visible + span { outline: 3px solid var(--gold); outline-offset: 2px; }
 .pill--yes input:checked + span { background: var(--ink); color: var(--gold); box-shadow: 3px 3px 0 var(--red); transform: rotate(-1.5deg); }
+@media (max-width: 360px) { .choice { gap: 8px; } .pill span { font-size: 13.5px; padding: 6px 4px; white-space: nowrap; } .pill small { font-size: 10.5px; } }
+.pill--both input:checked + span { background: linear-gradient(135deg, var(--wine), var(--ink)); color: var(--gold); box-shadow: 3px 3px 0 var(--gold-dk); transform: rotate(1deg); }
 .pill--no input:checked + span { background: #ece6ff; color: var(--ink); box-shadow: 3px 3px 0 var(--blue); transform: rotate(1.5deg); }
 .choice.is-invalid .pill span { border-color: var(--red); }
 
@@ -535,12 +567,23 @@ button, input { font: inherit; color: inherit; }
 .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
 .reveal.is-in { opacity: 1; transform: none; }
 .ticket.reveal.is-in { transform: rotate(-.6deg); }
+.ticket:nth-child(2n).reveal.is-in { transform: rotate(.6deg); }
 .signup.reveal.is-in { transform: rotate(.5deg); }
 
 /* ---------- Pantallas más grandes ---------- */
 @media (min-width: 720px) {
   .wrap { padding-top: 28px; gap: 24px; }
   .dock { display: none; }
+}
+/* Computadora/tablet horizontal: los tickets lado a lado (jueves izq., viernes der.) */
+@media (min-width: 760px) {
+  .wrap { max-width: 1000px; }
+  .wrap > .hero, .wrap > .foot { width: 100%; max-width: 460px; justify-self: center; }
+  .wrap > .signup { width: 100%; max-width: 520px; justify-self: center; }
+  .tickets__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; align-items: stretch; }
+  .tickets__grid .ticket:only-child { grid-column: 1 / -1; width: 100%; max-width: 460px; justify-self: center; }
+  .ticket__main { display: flex; flex-direction: column; }
+  .ticket__actions { margin-top: auto; padding-top: 14px; }
 }
 
 /* ---------- Movimiento reducido ---------- */

@@ -21,33 +21,106 @@
   const hash = (s) => { let h = 7; for (const ch of s) h = (h * 31 + ch.codePointAt(0)) >>> 0; return h; };
   const pad = (n) => String(n).padStart(2, "0");
 
-  const start = new Date(C.startISO);
-  const validStart = !isNaN(start);
   const tz = C.timeZone || undefined;
-  const fmt = (opts) => validStart ? new Intl.DateTimeFormat("es", { timeZone: tz, ...opts }).format(start) : "—";
-  const dateLabel = fmt({ weekday: "short", day: "numeric", month: "short" }).replace(/\./g, "");
-  const dateLong = fmt({ weekday: "long", day: "numeric", month: "long" });
-  const timeLabel = fmt({ hour: "numeric", minute: "2-digit", hour12: true })
-    .replace(/\s?a\.?\s?m\.?/i, " AM").replace(/\s?p\.?\s?m\.?/i, " PM").replace(/ /g, " ");
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const ampm = (s) => s.replace(/\s?a\.?\s?m\.?/i, " AM").replace(/\s?p\.?\s?m\.?/i, " PM").replace(/ /g, " ");
 
-  /* ---------- Render de datos del evento ---------- */
+  /* ---------- Noches del evento (config.events) ---------- */
+  const rawEvents = Array.isArray(C.events) && C.events.length ? C.events
+    : [{ id: "vie", startISO: C.startISO, venue: C.venue }]; // compatibilidad con la config antigua
+  const events = rawEvents.map((e, i) => {
+    const start = new Date(e.startISO);
+    const ok = !isNaN(start);
+    const f = (opts) => ok ? new Intl.DateTimeFormat("es", { timeZone: tz, ...opts }).format(start) : "—";
+    const venue = e.venue || {};
+    return {
+      id: String(e.id || "n" + (i + 1)),
+      label: e.label || `Noche ${i + 1}`,
+      emoji: e.emoji || "🎉",
+      start, ok, venue,
+      weekday: cap(f({ weekday: "long" })),                                     // "Jueves"
+      dayNum: f({ day: "numeric" }),                                            // "26"
+      dateMid: f({ day: "numeric", month: "short" }).replace(/\./g, ""),       // "26 nov"
+      short: cap(f({ weekday: "short", day: "numeric" }).replace(/\./g, "")),   // "Jue 26"
+      timeLabel: e.timeTBD ? "Por confirmar" : ampm(f({ hour: "numeric", minute: "2-digit", hour12: true })),
+      timeTBD: !!e.timeTBD,
+      dress: e.dressCode || C.dressCode || {},
+      hours: e.durationHours || C.durationHours || 5,
+      mapsHref: venue.mapsUrl ||
+        "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(venue.mapsQuery || venue.address || venue.name || ""),
+    };
+  });
+  const multi = events.length > 1;
+  const byId = (id) => events.find((e) => e.id === id);
+
+  /* ---------- Render de datos generales ---------- */
   const name = clean(C.celebrant?.name, 30) || "Cumpleañer@";
   $("#celebrantName").textContent = name + "'s";
   document.title = `${name}'s Birthday`;
   const age = C.celebrant?.age;
   $("#vinylAge").textContent = age ? String(age) : "★";
-
-  $("#evDate").textContent = dateLabel;
-  $("#evTime").textContent = timeLabel;
-  $("#evVenue").textContent = C.venue?.name || "";
-  $("#evAddress").textContent = C.venue?.address || "";
-  $("#evDress").textContent = C.dressCode?.title || "";
-  $("#evDressDetail").textContent = C.dressCode?.detail || "";
   $("#deadline").textContent = C.rsvpDeadline || "la fiesta";
+  if (!multi) $("#ticketsKicker").textContent = "Tu pase";
 
-  const mapsHref = C.venue?.mapsUrl ||
-    "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.venue?.mapsQuery || C.venue?.address || C.venue?.name || "");
-  $("#mapsBtn").href = mapsHref;
+  /* ---------- Calendario (enlace por noche) ---------- */
+  const utc = (d) => d.toISOString().replace(/[-:]/g, "").replace(/[.][0-9]{3}/, "");
+  const calTitle = (e) => `${name}'s Birthday 🎉` + (multi ? ` · ${e.weekday}` : "");
+  const calLoc = (e) => [e.venue.name, e.venue.address].filter(Boolean).join(", ");
+  const calDetails = (e) => `Dress code: ${e.dress.title || ""}. ${e.dress.detail || ""}` +
+    (e.timeTBD ? "\nHora por confirmar." : "") + `\n${location.href.split(/[?#]/)[0]}`;
+  function googleCalUrl(e) {
+    const end = new Date(e.start.getTime() + e.hours * 3600e3);
+    const u = new URL("https://calendar.google.com/calendar/render");
+    u.searchParams.set("action", "TEMPLATE");
+    u.searchParams.set("text", calTitle(e));
+    u.searchParams.set("dates", `${utc(e.start)}/${utc(end)}`);
+    u.searchParams.set("location", calLoc(e));
+    u.searchParams.set("details", calDetails(e));
+    return u.toString();
+  }
+  const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document;
+  function openIcs(e) {
+    const end = new Date(e.start.getTime() + e.hours * 3600e3);
+    const esc = (s) => s.replace(/[\;,]/g, (m) => "\\" + m).replace(/\n/g, "\\n");
+    const ics = [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//BirthdayTour//ES", "BEGIN:VEVENT",
+      `UID:${utc(e.start)}-${e.id}-birthdaytour`, `DTSTAMP:${utc(new Date())}`,
+      `DTSTART:${utc(e.start)}`, `DTEND:${utc(end)}`,
+      `SUMMARY:${esc(calTitle(e))}`, `LOCATION:${esc(calLoc(e))}`, `DESCRIPTION:${esc(calDetails(e))}`,
+      "END:VEVENT", "END:VCALENDAR",
+    ].join("\r\n");
+    location.href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
+  }
+
+  /* ---------- Tickets ---------- */
+  const tpl = $("#ticketTpl");
+  const ticketsHost = $("#tickets");
+  events.forEach((e, i) => {
+    const node = tpl.content.firstElementChild.cloneNode(true);
+    const f = (k) => node.querySelector(`[data-f="${k}"]`);
+    node.dataset.night = e.id;
+    node.setAttribute("aria-label", `Pase ${e.label}: ${e.weekday} ${e.dateMid}`);
+    f("label").textContent = e.label;
+    f("weekday").textContent = e.weekday;
+    f("date").textContent = e.dateMid;
+    f("time").textContent = e.timeLabel;
+    f("time").classList.toggle("is-tbd", e.timeTBD);
+    f("venue").textContent = e.venue.name || "";
+    f("address").textContent = e.venue.address || "";
+    f("dress").textContent = e.dress.title || "";
+    f("dressDetail").textContent = e.dress.detail || "";
+    f("maps").href = e.mapsHref;
+    f("maps").setAttribute("aria-label", `Cómo llegar a ${e.venue.name || "la fiesta"} (${e.weekday})`);
+    const cal = f("cal");
+    cal.setAttribute("aria-label", `Agendar el ${e.weekday.toLowerCase()} en tu calendario`);
+    if (e.ok) {
+      cal.href = googleCalUrl(e);
+      cal.addEventListener("click", (ev) => { if (isApple && !window.__NO_ICS__) { ev.preventDefault(); openIcs(e); } });
+    } else cal.hidden = true;
+    f("seat").textContent = pad((hash(name + e.id) % 40) + 1);
+    f("no").textContent = "Nº " + String(hash(navigator.userAgent + name + e.id) % 9000 + 1000);
+    ticketsHost.appendChild(node);
+  });
 
   // Saludo personalizado: comparte el link como …/?invitado=Ana
   const params = new URLSearchParams(location.search);
@@ -63,8 +136,10 @@
   const songs = Array.isArray(C.songs) ? C.songs : [];
   const ticker = $("#ticker");
   const frag = document.createDocumentFragment();
-  const tickerItems = [`${name}'s Birthday`, `${dateLabel} · ${timeLabel}`, C.venue?.name, C.venue?.address,
-    age ? `${age} años` : "", "Una noche mágica", C.dressCode?.title ? `Dress code: ${C.dressCode.title}` : ""].filter(Boolean);
+  const tickerItems = [`${name}'s Birthday`,
+    ...events.map((e) => [e.short + " " + e.dateMid.split(" ")[1], e.venue.name, e.timeTBD ? "" : e.timeLabel].filter(Boolean).join(" · ")),
+    age ? `${age} años` : "", multi ? "Dos noches mágicas" : "Una noche mágica",
+    C.dressCode?.title ? `Dress code: ${C.dressCode.title}` : ""].filter(Boolean);
   for (let k = 0; k < 4; k++) tickerItems.forEach((s) => { const el = document.createElement("span"); el.textContent = s; frag.appendChild(el); });
   ticker.appendChild(frag);
   const dl = $("#songList");
@@ -86,20 +161,28 @@
   }
 
 
-  /* ---------- Cuenta regresiva ---------- */
+  /* ---------- Cuenta regresiva (a la próxima noche) ---------- */
   const cdEls = { d: $("#cdD"), h: $("#cdH"), m: $("#cdM"), s: $("#cdS") };
+  const cdBox = $("#countdown");
   let cdTimer;
   function tickCountdown() {
-    if (!validStart) return;
-    const diff = start - Date.now();
-    if (diff <= 0) {
+    const now = Date.now();
+    const next = events.find((e) => e.ok && now < e.start.getTime() + e.hours * 3600e3);
+    if (!next) {
       clearInterval(cdTimer);
-      const box = $("#countdown");
-      box.classList.add("is-live");
-      const after = Date.now() - start > (C.durationHours || 5) * 3600e3;
-      box.innerHTML = `<div class="live">${after ? "Gracias por bailar con nosotros ★" : "¡La fiesta empezó! 🎉"}</div>`;
+      cdBox.classList.add("is-live");
+      $("#cdLive").textContent = events.some((e) => e.ok) ? "Gracias por bailar con nosotros ★" : "";
+      $("#cdCap").textContent = "";
       return;
     }
+    const diff = next.start - now;
+    $("#cdCap").textContent = multi ? `para el ${next.weekday.toLowerCase()} ${next.dayNum}` : "";
+    if (diff <= 0) {
+      cdBox.classList.add("is-live");
+      $("#cdLive").textContent = "¡La fiesta empezó! 🎉";
+      return;
+    }
+    cdBox.classList.remove("is-live");
     const t = Math.floor(diff / 1000);
     const vals = { d: Math.floor(t / 86400), h: Math.floor(t / 3600) % 24, m: Math.floor(t / 60) % 60, s: t % 60 };
     for (const k in vals) {
@@ -113,42 +196,35 @@
   tickCountdown();
   cdTimer = setInterval(tickCountdown, 1000);
 
-  /* ---------- Agendar en calendario ---------- */
-  $("#calBtn").addEventListener("click", () => {
-    if (!validStart) return;
-    const end = new Date(start.getTime() + (C.durationHours || 5) * 3600e3);
-    const utc = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-    const title = `${name}'s Birthday 🎉`;
-    const loc = [C.venue?.name, C.venue?.address].filter(Boolean).join(", ");
-    const details = `Dress code: ${C.dressCode?.title || ""}. ${C.dressCode?.detail || ""}\n${location.href.split("?")[0]}`;
-    const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document;
-
-    if (isApple) {
-      const esc = (s) => s.replace(/[\\;,]/g, (m) => "\\" + m).replace(/\n/g, "\\n");
-      const ics = [
-        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//BirthdayTour//ES", "BEGIN:VEVENT",
-        `UID:${utc(start)}-birthdaytour`, `DTSTAMP:${utc(new Date())}`,
-        `DTSTART:${utc(start)}`, `DTEND:${utc(end)}`,
-        `SUMMARY:${esc(title)}`, `LOCATION:${esc(loc)}`, `DESCRIPTION:${esc(details)}`,
-        "END:VEVENT", "END:VCALENDAR",
-      ].join("\r\n");
-      location.href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
-    } else {
-      const u = new URL("https://calendar.google.com/calendar/render");
-      u.searchParams.set("action", "TEMPLATE");
-      u.searchParams.set("text", title);
-      u.searchParams.set("dates", `${utc(start)}/${utc(end)}`);
-      u.searchParams.set("location", loc);
-      u.searchParams.set("details", details);
-      window.open(u.toString(), "_blank", "noopener");
-    }
-  });
-
   /* ---------- Formulario ---------- */
   const form = $("#rsvpForm");
   const msg = $("#formMsg");
   const btn = $("#submitBtn");
   const songField = $("#songField");
+
+  // Opciones de asistencia: una por noche, "las dos" y "no podré"
+  const attendField = $("#attendField");
+  const choices = multi
+    ? [...events.map((e) => ({ v: e.id, t: `${e.emoji} ${e.weekday} ${e.dayNum}`, sub: e.venue.name, cls: "yes" })),
+       { v: "ambos", t: "✨ ¡A las dos!", sub: events.map((e) => e.short.split(" ")[0]).join(" + "), cls: "both" }]
+    : [{ v: events[0].id, t: "🎉 ¡Ahí estaré!", cls: "yes" }];
+  choices.push({ v: "no", t: "💔 No podré", sub: multi ? "Ninguna noche" : "", cls: "no" });
+  if (!multi) $("#attendLegend").textContent = "¿Te apuntas a la fiesta?";
+  choices.forEach((c, i) => {
+    const label = document.createElement("label");
+    label.className = `pill pill--${c.cls}`;
+    const input = document.createElement("input");
+    Object.assign(input, { type: "radio", name: "attending", value: c.v });
+    if (i === 0) input.required = true;
+    const span = document.createElement("span");
+    span.textContent = c.t;
+    if (c.sub) { const sm = document.createElement("small"); sm.textContent = c.sub; span.appendChild(sm); }
+    label.append(input, span);
+    attendField.appendChild(label);
+  });
+  // Respuesta guardada con la versión anterior ("si" = la única noche que había: el viernes)
+  const normAttending = (v) => v === "si" ? (byId("vie") || events[events.length - 1]).id : v;
+  const nightsFor = (v) => v === "ambos" ? events : events.filter((e) => e.id === v);
 
   form.addEventListener("change", (e) => {
     if (e.target.name === "attending") {
@@ -167,7 +243,7 @@
       firstName: titleCase(clean(fd.get("firstName"), 40)),
       lastName: titleCase(clean(fd.get("lastName"), 40)),
       attending: fd.get("attending") || "",
-      song: fd.get("attending") === "si" ? clean(fd.get("song"), 80) : "",
+      song: fd.get("attending") && fd.get("attending") !== "no" ? clean(fd.get("song"), 80) : "",
       website: clean(fd.get("website"), 100), // honeypot
     };
   }
@@ -180,7 +256,7 @@
     mark($("#attendField"), !d.attending);
     if (first) {
       msg.textContent = !d.attending && d.firstName.length >= 2 && d.lastName.length >= 2
-        ? "Elige si vienes o no 🎉"
+        ? (multi ? "Elige a qué noche vienes 🎉" : "Elige si vienes o no 🎉")
         : "Escribe tu nombre y apellido para firmar la lista ✍️";
       (first.querySelector("input") || first).focus({ preventScroll: false });
       return false;
@@ -252,14 +328,17 @@
   let lastFocus = null;
 
   function showThanks(r) {
-    const yes = r.attending === "si";
+    const nights = nightsFor(normAttending(r.attending));
+    const yes = nights.length > 0;
+    const both = multi && nights.length === events.length;
+    const when = !multi ? "" : both ? " las dos noches" : ` el ${nights[0]?.weekday.toLowerCase()}`;
     const pass = overlay.querySelector(".pass");
     pass.classList.toggle("is-no", !yes);
     $("#passBand").textContent = yes ? "ALL ACCESS" : "WE'LL MISS YOU";
-    $("#passEyebrow").textContent = yes ? "Backstage pass" : "Gracias por avisar";
+    $("#passEyebrow").textContent = yes ? (both ? "Backstage pass · 2 noches" : "Backstage pass") : "Gracias por avisar";
     $("#passName").textContent = `${r.firstName} ${r.lastName}`;
     $("#passMsg").textContent = yes
-      ? `¡Estás en la lista, ${r.firstName}! Prepara tus mejores pasos (y tu varita ϟ): ${name} te espera para bailar toda la noche.`
+      ? `¡Estás en la lista, ${r.firstName}! Prepara tus mejores pasos (y tu varita ϟ): ${name} te espera${when} para bailar sin parar.`
       : `Te vamos a extrañar, ${r.firstName}. Bailaremos una por ti 💔 Si cambian tus planes, aquí mismo puedes actualizar tu respuesta.`;
 
     const song = $("#passSong");
@@ -270,7 +349,10 @@
     meta.replaceChildren();
     if (yes) {
       const seat = (hash(r.firstName + r.lastName) % 98) + 1;
-      [["Fecha", dateLabel], ["Hora", timeLabel], ["Asiento", "A-" + pad(seat)]].forEach(([k, v]) => {
+      const rows = nights.map((e) => [e.short, multi ? e.venue.name : e.timeLabel]);
+      if (!multi) rows.unshift(["Fecha", nights[0].dateMid]);
+      rows.push(["Asiento", "A-" + pad(seat)]);
+      rows.forEach(([k, v]) => {
         const s = document.createElement("span"); const b = document.createElement("b");
         b.textContent = v; s.append(k, b); meta.appendChild(s);
       });
@@ -310,7 +392,8 @@
   function prefill(r) {
     $("#firstName").value = r.firstName || "";
     $("#lastName").value = r.lastName || "";
-    const radio = form.querySelector(`input[name="attending"][value="${r.attending === "no" ? "no" : "si"}"]`);
+    const v = normAttending(r.attending);
+    const radio = [...form.querySelectorAll('input[name="attending"]')].find((el) => el.value === v);
     if (radio) radio.checked = true;
     $("#song").value = r.song || "";
     songField.classList.toggle("is-hidden", r.attending === "no");
@@ -355,9 +438,6 @@
     if (r) { e.preventDefault(); showThanks(r); }
   });
 
-  // Número de ticket estable por dispositivo
-  $("#stubNo").textContent = "Nº " + String(hash(navigator.userAgent + name) % 9000 + 1000);
-  $("#stubSeat").textContent = pad((hash(name) % 40) + 1);
 
   /* ---------- CTA fija: ocultar cuando el formulario está visible ---------- */
   let rsvpVisible = false;

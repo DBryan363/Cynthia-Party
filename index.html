@@ -10,7 +10,7 @@
   <!-- Vista previa al compartir por WhatsApp. Cambia og:url y og:image por URLs absolutas de tu sitio publicado. -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="🎉 Cynthia's Birthday · Estás en la lista VIP">
-  <meta property="og:description" content="Una noche para bailar y celebrar. Toca para ver tu pase y confirmar.">
+  <meta property="og:description" content="Dos noches para bailar y celebrar. Toca para ver tus pases y confirmar.">
   <meta property="og:image" content="assets/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -40,7 +40,7 @@
     <!-- ============ HERO ============ -->
     <header class="hero" id="top">
       <p class="hero__kicker reveal">
-        <span class="star-ico">ϟ</span> Una noche mágica <span class="star-ico">ϟ</span>
+        <span class="star-ico">ϟ</span> Dos noches mágicas <span class="star-ico">ϟ</span>
       </p>
 
       <p class="hero__greeting reveal" id="greeting" hidden></p>
@@ -60,7 +60,7 @@
       </div>
 
       <p class="hero__lead reveal" id="heroLead">
-        Una noche mágica de pura diversión para bailar, reír y disfrutar juntos. ¡No te la puedes perder!
+        Dos noches mágicas de pura diversión para bailar, reír y disfrutar juntos. ¡No te las puedes perder!
       </p>
 
       <div class="eq reveal" aria-hidden="true">
@@ -72,55 +72,61 @@
         <div class="cd"><b id="cdH">00</b><small>hrs</small></div>
         <div class="cd"><b id="cdM">00</b><small>min</small></div>
         <div class="cd"><b id="cdS">00</b><small>seg</small></div>
+        <div class="live" id="cdLive"></div>
       </div>
+      <p class="cd-cap reveal" id="cdCap"></p>
     </header>
 
-    <!-- ============ TICKET ============ -->
-    <section class="ticket reveal" aria-labelledby="ticketTitle">
-      <div class="ticket__main">
-        <div class="ticket__head">
-          <span class="ticket__badge">9¾</span>
-          <h2 id="ticketTitle">Expreso VIP · Admit one</h2>
-        </div>
-
-        <dl class="ticket__grid">
-          <div class="field">
-            <dt>Fecha</dt>
-            <dd id="evDate">—</dd>
-          </div>
-          <div class="field">
-            <dt>Hora</dt>
-            <dd id="evTime">—</dd>
-          </div>
-          <div class="field field--wide">
-            <dt>Lugar</dt>
-            <dd><span id="evVenue">—</span><small id="evAddress"></small></dd>
-          </div>
-          <div class="field field--wide field--dress">
-            <dt>Dress code</dt>
-            <dd><span id="evDress">—</span><small id="evDressDetail"></small></dd>
-          </div>
-        </dl>
-
-        <div class="ticket__actions">
-          <a class="btn btn--gold" id="mapsBtn" href="#" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
-            Cómo llegar
-          </a>
-          <button class="btn btn--ghost" id="calBtn" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm12 8v9H5v-9h14Z"/></svg>
-            Agendar
-          </button>
-        </div>
-      </div>
-
-      <div class="ticket__stub" aria-hidden="true">
-        <span class="stub__row">ANDÉN <b>9¾</b></span>
-        <span class="stub__row">VAGÓN <b id="stubSeat">01</b></span>
-        <span class="barcode"></span>
-        <span class="stub__no" id="stubNo">Nº 0000</span>
-      </div>
+    <!-- ============ TICKETS (uno por noche, se generan desde config.js) ============ -->
+    <section class="tickets" aria-label="Pases para cada noche">
+      <p class="tickets__kicker reveal"><span class="star-ico">ϟ</span> <span id="ticketsKicker">Dos noches, dos pases</span> <span class="star-ico">ϟ</span></p>
+      <div class="tickets__grid" id="tickets"></div>
     </section>
+
+    <template id="ticketTpl">
+      <article class="ticket reveal">
+        <div class="ticket__main">
+          <div class="ticket__head">
+            <span class="ticket__badge" data-f="label">Noche</span>
+            <span class="ticket__kind">Expreso VIP · Admit one</span>
+          </div>
+          <h3 class="ticket__day"><b data-f="weekday"></b><span data-f="date"></span></h3>
+
+          <dl class="ticket__grid">
+            <div class="field">
+              <dt>Hora</dt>
+              <dd data-f="time"></dd>
+            </div>
+            <div class="field">
+              <dt>Lugar</dt>
+              <dd><span data-f="venue"></span><small data-f="address"></small></dd>
+            </div>
+            <div class="field field--wide field--dress">
+              <dt>Dress code</dt>
+              <dd><span data-f="dress"></span><small data-f="dressDetail"></small></dd>
+            </div>
+          </dl>
+
+          <div class="ticket__actions">
+            <a class="btn btn--gold" data-f="maps" href="#" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+              Cómo llegar
+            </a>
+            <a class="btn btn--ghost" data-f="cal" href="#" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm12 8v9H5v-9h14Z"/></svg>
+              Agendar
+            </a>
+          </div>
+        </div>
+
+        <div class="ticket__stub" aria-hidden="true">
+          <span class="stub__row">ANDÉN <b>9¾</b></span>
+          <span class="stub__row">VAGÓN <b data-f="seat">01</b></span>
+          <span class="barcode"></span>
+          <span class="stub__no" data-f="no">Nº 0000</span>
+        </div>
+      </article>
+    </template>
 
     <!-- ============ RSVP ============ -->
     <section class="signup reveal" id="rsvp" aria-labelledby="rsvpTitle">
@@ -143,15 +149,8 @@
         </div>
 
         <fieldset class="choice" id="attendField">
-          <legend>¿Te apuntas a la fiesta?</legend>
-          <label class="pill pill--yes">
-            <input type="radio" name="attending" value="si" required>
-            <span>🎉 ¡Ahí estaré!</span>
-          </label>
-          <label class="pill pill--no">
-            <input type="radio" name="attending" value="no">
-            <span>💔 No podré</span>
-          </label>
+          <legend id="attendLegend">¿A qué noche te apuntas?</legend>
+          <!-- Las opciones se generan desde config.js: una por noche + "las dos" + "no podré" -->
         </fieldset>
 
         <label class="line line--song" id="songField">

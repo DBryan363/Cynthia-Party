@@ -23,6 +23,10 @@ const CONFIG = {
   CLOSED: false,          // cámbialo a true para cerrar las confirmaciones
 };
 
+// Opciones que envía la invitación → lo que se escribe en la columna "Asistirá".
+// Los códigos (jue, vie) deben coincidir con los "id" de config.js → events.
+const NIGHTS = { jue: 'Jueves', vie: 'Viernes', ambos: 'Ambas', no: 'No', si: 'Viernes' };
+
 const HEADERS = ['Nombre', 'Apellido', 'Asistirá', 'Canción', 'Primera respuesta', 'Última actualización', 'Cambios', 'Clave'];
 
 function doPost(e) {
@@ -37,8 +41,8 @@ function doPost(e) {
 
     const firstName = cleanText_(body.firstName, 40);
     const lastName = cleanText_(body.lastName, 40);
-    const attending = body.attending === 'si' ? 'Sí' : body.attending === 'no' ? 'No' : '';
-    const song = attending === 'Sí' ? cleanText_(body.song, 80) : '';
+    const attending = Object.prototype.hasOwnProperty.call(NIGHTS, body.attending) ? NIGHTS[body.attending] : '';
+    const song = attending && attending !== 'No' ? cleanText_(body.song, 80) : '';
 
     if (firstName.length < 2 || lastName.length < 2 || !attending) return json_({ ok: false, error: 'invalid' });
     if (!rateLimitOk_()) return json_({ ok: false, error: 'busy' });
@@ -85,17 +89,21 @@ function setup() {
   if (!sum) sum = ss.insertSheet(CONFIG.SUMMARY_NAME);
   sum.clear();
   const R = "'" + CONFIG.SHEET_NAME + "'";
-  sum.getRange('A1:B1').setValues([['🎤 The Birthday Tour', '']]).setFontWeight('bold').setFontSize(14);
-  sum.getRange('A3:B6').setValues([
-    ['✅ Confirmados', '=COUNTIF(' + R + '!C2:C,"Sí")'],
-    ['💔 No asistirán', '=COUNTIF(' + R + '!C2:C,"No")'],
+  sum.getRange('A1:B1').setValues([["🎉 Cynthia's Birthday", '']]).setFontWeight('bold').setFontSize(14);
+  const C_ = R + '!C2:C';
+  sum.getRange('A3:B8').setValues([
+    ['🪄 Van el jueves', '=COUNTIF(' + C_ + ',"Jueves")+COUNTIF(' + C_ + ',"Ambas")'],
+    ['🎉 Van el viernes', '=COUNTIF(' + C_ + ',"Viernes")+COUNTIF(' + C_ + ',"Ambas")+COUNTIF(' + C_ + ',"Sí")'],
+    ['✨ Van a las dos', '=COUNTIF(' + C_ + ',"Ambas")'],
+    ['💔 No asistirán', '=COUNTIF(' + C_ + ',"No")'],
     ['📝 Total respuestas', '=COUNTA(' + R + '!A2:A)'],
     ['🎶 Canciones pedidas', '=COUNTA(' + R + '!D2:D)'],
   ]);
-  sum.getRange('A8').setValue('Lista de confirmados').setFontWeight('bold');
-  sum.getRange('A9').setFormula('=IFERROR(SORT(FILTER({' + R + '!A2:A&" "&' + R + '!B2:B,' + R + '!D2:D},' + R + '!C2:C="Sí"),1,TRUE),"Aún nadie")');
+  sum.getRange('A10:C10').setValues([['Lista de confirmados', 'Noche', 'Canción']]).setFontWeight('bold');
+  sum.getRange('A11').setFormula('=IFERROR(SORT(FILTER({' + R + '!A2:A&" "&' + R + '!B2:B,' + C_ + ',' + R + '!D2:D},' + C_ + '<>"No",' + C_ + '<>""),1,TRUE),"Aún nadie")');
   sum.setColumnWidth(1, 260);
-  sum.setColumnWidth(2, 260);
+  sum.setColumnWidth(2, 120);
+  sum.setColumnWidth(3, 260);
   ss.setActiveSheet(sum);
 }
 
